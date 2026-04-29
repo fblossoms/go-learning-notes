@@ -1,0 +1,39 @@
+# Web请求流程
+- 浏览器 发起HTTP请求（一次请求，一次响应）
+  - 公网域名:80（默认是80） -> DNS域名服务器 -> 对端公网IP地址，就可以路由数据到 webServer
+  - 建立TCP连接，三次握手，对端就可以accept
+  - HTTP报文发过去 （Server端要用recv，read），等响应response
+  - 假设收到了HTML类型的响应报文，渲染引擎要解析HTML绘制出来（如 <table>、<h2></h2>等），如果有js脚本的话，js引擎运行他
+    - 在响应报文中，如果有其他外部文件的引用，就会通过这些文件的URL再次发起各自的请求
+      - 本域 资源再次发起请求
+      - 外域 新的一个HTTP请求
+- 服务端 被动接收
+  - 三次握手后，建立了与某一个浏览器的通信信道，就可以accept，返回一个和客户端通信的socket-conn
+  - conn就可以read了，等浏览器发来request请求报文，一旦到来就可以解析他
+    - 如何解析？
+      - 提取header中的所有数据
+        - 协议、
+        - 根下查询字符串，如/order?uid=1&xyz=111
+        - URL => path 请求路径
+        - method方法，如GET、POST、PUT、DELETE、PATCH
+      - 提取body中内容，POST、PUT、PATCH要提取请求的正文部分，GET不用
+        - 请求POST，不太使用FORM表单提交了，也会把表单数据封装到Json中提交
+  - URL + method => handler（处理函数） 返回值不同response报文的内容（HTML、Json）
+  - 静态资源
+    - css
+    - HTML
+    - JavaScript
+      - 如果上面三种都是文件，躺在磁盘上，文件读取
+    - jpg
+      - 验证码 代码动态生成img的二进制内容，磁盘没有，path -> handler 返回图片
+      - 图片资源在磁盘上，path /pic/a.jpg 映射到本地路径上 /image/xxx/yyy.jpg
+  - 动态资源
+    - 永远不要相信逻辑路径
+      - 如http://www.gxmu.com/a.html -> a.html + get -> handler 返回响应报文就行了
+      - 如http://www.gxmu.com/user restful风格，往往是动态
+
+  - 问题：
+    - Q：请问刚才的操作发起了几次http请求？
+      - A：只有一次
+    - Q：如果有图片，那图片怎么来的？
+      - A：通过URL再次发起各自的请求

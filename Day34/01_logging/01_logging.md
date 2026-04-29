@@ -1,0 +1,32 @@
+# 日志
+- log标准库
+  - Go中标准库有log包，提供了简单的日志功能
+    - 输出          格式输出        换行输出
+    - log.Print()  log.Printf()   log.Println()   类似于fmt.Print*
+    - log.Fatal()  log.Fatalf()   log.Fatalln()   相当于log.Print* + os.Exit(1)
+    - log.Panic()  log.Panicf()   log.Panicln()   相当于log.Print* + panic()
+
+  - log输出为什么是红色的？为什么要加日期？
+    - 控制台输出
+      - Stdout标准输出颜色为白色（Goland黑色风格时，VsCode为蓝色）
+      - stderr标准错误输出颜色为红色
+      - 标准输出和标准错误输出的顺序随机，但是内部遵守顺序
+  - 缺点
+    - 功能太少
+    - 自定义自由度低
+    - 没有消息级别，需要依赖手动加入前缀
+    - 没有消息的输出控制
+
+- 文件处理，（IO处理） 一进一出 一读一写 一收一发
+  - 1、按照flag打开
+  - 2、最重要的2个方法，Read、Write
+  - 3、别忘了Close()
+  - file descriptor fd 文件描述符
+    - 0   stdin
+    - 1   stdout
+    - 2   stderr
+  - 语法
+    - os.Open 只读打开
+    - os.OpenFile 指定模式打开（r只读，w只写，rw读写）
+  - 打开成功返回文件操作对象，即 可读 或 可写 或 可读写 对象
+    - 如果是可写对象，那就是io.Writer接口的Write方法
